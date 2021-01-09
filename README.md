@@ -9,3 +9,9 @@ Downloads and posts a meme to insta from a subreddit of your choice, in any time
 - run `__main__.py`
 - ???
 - Profit.
+
+# TODO
+- Plan for possible connection loss
+- Plan for failed reddit request
+- Plan for failed instagram post
+- Create better config file
