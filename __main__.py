@@ -22,7 +22,13 @@ def exitHandler():
 #Make sure to update the username and password in `secrets.py`
 def login():
     global bot
-    bot.api.login(username = IGlogin.user, password = IGlogin.password, use_cookie=False, use_uuid=False)
+    try:
+        bot.api.login(username = IGlogin.user, password = IGlogin.password, use_cookie=False, use_uuid=False)
+    except Exception as e:
+        print("ERROR!")
+        print(e)
+        print("---")
+        print("Login error! Please make sure you have an internet connection!")
 
 #Daily cache of reddit URLs. Clear after a day, but carry over the last 25.
 def cache():
@@ -45,7 +51,11 @@ def cache():
 #Change 'dankmemes' to whatever subreddit you want.
 def getImage():
     global usedUrl
-    json_raw = requests.get("https://www.reddit.com/r/dankmemes/new/.json", headers = {'User-agent': '15MinuteMeme'}).json()
+    try:
+        json_raw = requests.get("https://www.reddit.com/r/dankmemes/new/.json", headers = {'User-agent': '15MinuteMeme'}).json()
+    except Exception:
+        usedUrl.append("!!ERROR!!")
+        return
     json_data = json_raw['data']['children']
     for number in range(len(json_data)):
         json_post = json_data[number]['data']
@@ -79,6 +89,8 @@ def convert(file):
 def download():
     global usedUrl
     url = usedUrl[-1]
+    if url == "!!ERROR!!":
+        return False
     file = url.replace("https://i.redd.it/", "")
     f = open(file, 'wb')
     f.write(requests.get(url).content)
@@ -91,7 +103,14 @@ def download():
 #Change captions to whatever you want.
 def upload(file):
     global bot
-    bot.api.upload_photo(file, caption="#meme #memes #15minutememes", force_resize=True)
+    try:
+        bot.api.upload_photo(file, caption="#meme #memes #15minutememes", force_resize=True)
+    except Exception as e:
+        print("ERROR!")
+        print(e)
+        print("---")
+        print("Upload error! Please make sure you have an internet connection!")
+        return
     try:
         os.remove(file + '.REMOVE_ME')
     except Exception:
@@ -108,7 +127,10 @@ def main():
         cache()
         getImage()
         file = download()
-        upload(file)
+        if file == False:
+            print("Bot error! No connection or upload failed!")
+        else:
+            upload(file)
         time.sleep((15*60)) #(time in minutes*60)
 
 main()
